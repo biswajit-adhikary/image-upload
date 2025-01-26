@@ -81,7 +81,7 @@ const ImageUpload = () => {
 
         {image && (
           <div className="mb-4">
-            <Image src={image} alt="Selected" width={300} height={200} />
+            <Image src={image} alt="Selected" width={500} height={200} />
           </div>
         )}
 

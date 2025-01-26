@@ -22,9 +22,7 @@ export async function POST(req) {
   try {
     // Read form data
     const formData = await req.formData();
-    console.log("Form data:", formData);
     const file = formData.get("file");
-    console.log("File:", file);
 
     if (!file) {
       return new Response(JSON.stringify({ message: "No file uploaded" }), {
