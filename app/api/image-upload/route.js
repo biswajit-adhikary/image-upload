@@ -32,8 +32,8 @@ export async function POST(req) {
 
     // Compress the image using sharp
     const compressedBuffer = await sharp(await file.arrayBuffer())
-      .resize(800) // Resize the image to width 800px (optional)
-      .jpeg({ quality: 80 }) // Compress and convert to JPEG with 80% quality
+      .resize(600) // Resize the image to width 800px (optional)
+      .jpeg({ quality: 60 }) // Compress and convert to JPEG with 80% quality
       .toBuffer(); // Return as Buffer
 
     // Create a file in the Google Cloud Storage bucket
