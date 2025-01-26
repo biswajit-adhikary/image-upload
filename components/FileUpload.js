@@ -7,6 +7,7 @@ const FileUpload = () => {
   const [file, setFile] = useState(null);
   const [image, setImage] = useState(null);
   const [message, setMessage] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleFileChange = async (e) => {
     let imagefile = e.target.files[0];
@@ -31,6 +32,7 @@ const FileUpload = () => {
       setMessage("Please select a file before uploading.");
       return;
     }
+    setIsUploading(true);
 
     const formData = new FormData();
     formData.append("file", file);
@@ -46,6 +48,8 @@ const FileUpload = () => {
     } catch (error) {
       setMessage("An error occurred while uploading the file.");
       console.error("Upload error:", error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -72,7 +76,7 @@ const FileUpload = () => {
           type="submit"
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
-          Upload
+          {isUploading ? "Uploading..." : "Upload"}
         </button>
       </form>
       {message && <p className="mt-4 text-center text-gray-700">{message}</p>}
