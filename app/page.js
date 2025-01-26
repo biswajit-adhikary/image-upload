@@ -7,7 +7,7 @@ export default function Home() {
     <>
       {/* <FileUpload /> */}
       <ImageUpload />
-      <NewUpload />
+      {/* <NewUpload /> */}
     </>
   );
 }
