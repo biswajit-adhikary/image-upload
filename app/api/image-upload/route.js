@@ -1,6 +1,8 @@
 import { Storage } from "@google-cloud/storage";
 import sharp from "sharp";
-export const runtime = "edge";
+import { PassThrough } from "stream";
+
+export const runtime = "edge"; // Set the runtime to Edge
 
 // Initialize Google Cloud Storage client
 const storage = new Storage({
@@ -31,6 +33,8 @@ export async function POST(req) {
     // Create a unique name for the file to prevent overwriting
     const fileName = `${Date.now()}-${file.name}`;
 
+    const passThrough = new PassThrough();
+
     // Compress the image using sharp
     const compressedBuffer = await sharp(await file.arrayBuffer())
       .resize(600) // Resize the image to width 800px (optional)
@@ -46,6 +50,8 @@ export async function POST(req) {
 
     // Pipe the compressed buffer to the stream
     blobStream.end(compressedBuffer);
+
+    passThrough.pipe(blobStream);
 
     // Return a Promise to manage asynchronous response
     return new Promise((resolve, reject) => {
