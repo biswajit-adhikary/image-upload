@@ -44,6 +44,7 @@ const FileUpload = () => {
           </label>
           <input
             type="file"
+            accept="image/*"
             onChange={handleFileChange}
             className="block w-full border rounded p-2"
           />

@@ -19,7 +19,6 @@ export async function POST(req) {
     // Read form data
     const formData = await req.formData();
     const file = formData.get("files");
-    console.log("File:", file);
 
     if (!file) {
       return new Response(JSON.stringify({ message: "No file uploaded" }), {
@@ -28,7 +27,7 @@ export async function POST(req) {
     }
 
     // Create a unique name for the file to prevent overwriting
-    const fileName = `${Date.now()}-${file.name}`;
+    const fileName = `${Date.now()}.wpbp`;
 
     // Compress the image using sharp
     const compressedBuffer = await sharp(await file.arrayBuffer())
