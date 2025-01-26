@@ -1,6 +1,10 @@
 import { Storage } from "@google-cloud/storage";
 import sharp from "sharp";
 
+export const config = {
+  runtime: "edge", // Use Vercel Edge Runtime
+};
+
 // Initialize Google Cloud Storage client
 const storage = new Storage({
   projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
