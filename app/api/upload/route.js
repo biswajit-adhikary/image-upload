@@ -1,8 +1,14 @@
 import { Storage } from "@google-cloud/storage";
 import sharp from "sharp";
 
+// export const config = {
+//   runtime: "edge", // Use Vercel Edge Runtime
+// };
+
 export const config = {
-  runtime: "edge", // Use Vercel Edge Runtime
+  api: {
+    responseLimit: "8mb",
+  },
 };
 
 // Initialize Google Cloud Storage client
