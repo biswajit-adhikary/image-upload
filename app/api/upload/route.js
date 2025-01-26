@@ -1,41 +1,93 @@
-import { NextResponse } from "next/server";
-import fs from "fs";
-import { pipeline } from "stream";
-import { promisify } from "util";
+import { Storage } from "@google-cloud/storage";
+import sharp from "sharp";
 
-// import { updateCourse } from "@/app/actions/course";
+export const config = {
+  runtime: "edge", // Use Vercel Edge Runtime
+};
 
-const pump = promisify(pipeline);
+// Initialize Google Cloud Storage client
+const storage = new Storage({
+  projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+  credentials: {
+    client_email: process.env.GOOGLE_CLOUD_CLIENT_EMAIL,
+    private_key: process.env.GOOGLE_CLOUD_PRIVATE_KEY.replace(/\\n/g, "\n"),
+  },
+});
 
-export async function POST(request, response) {
+const bucketName = "imageszx"; // Replace with your bucket name
+const bucket = storage.bucket(bucketName);
+
+// POST request handler for uploading the image
+export async function POST(req) {
   try {
-    const formData = await request.formData();
+    // Read form data
+    const formData = await req.formData();
     console.log("Form data:", formData);
-    const file = formData.get("files");
-    console.log(file);
-    const destination = formData.get("destination");
+    const file = formData.get("file");
+    console.log("File:", file);
 
-    if (!destination) {
-      return new NextResponse("Destination not provided", {
-        status: 500,
+    if (!file) {
+      return new Response(JSON.stringify({ message: "No file uploaded" }), {
+        status: 400,
       });
     }
 
-    const filePath = `${destination}/${file.name}`;
+    // Create a unique name for the file to prevent overwriting
+    const fileName = `${Date.now()}.wpbp`;
 
-    await pump(file.stream(), fs.createWriteStream(filePath));
+    // Compress the image using sharp
+    const compressedBuffer = await sharp(await file.arrayBuffer())
+      .resize(500) // Resize the image to width 800px (optional)
+      .webp({ quality: 50 }) // Compress and convert to JPEG with 80% quality
+      .toBuffer(); // Return as Buffer
 
-    // This can be decoupled to another
-    // route handler
-    // const courseId = formData.get("courseId");
-    // await updateCourse(courseId, { thumbnail: file.name });
-
-    return new NextResponse(`File ${file.name} uploaded successfully`, {
-      status: 200,
+    // Create a file in the Google Cloud Storage bucket
+    const blob = bucket.file(fileName);
+    const blobStream = blob.createWriteStream({
+      resumable: false,
+      contentType: "image/jpeg", // Set content type for compressed JPEG image
     });
-  } catch (err) {
-    return new NextResponse(err.message, {
-      status: 500,
+
+    // Pipe the compressed buffer to the stream
+    blobStream.end(compressedBuffer);
+
+    // Return a Promise to manage asynchronous response
+    return new Promise((resolve, reject) => {
+      blobStream.on("error", (err) => {
+        console.error("Error uploading file:", err);
+        reject(
+          new Response(
+            JSON.stringify({
+              message: "Error uploading file",
+              error: err.message,
+            }),
+            { status: 500 }
+          )
+        );
+      });
+
+      blobStream.on("finish", async () => {
+        await blob.makePublic();
+        const publicUrl = `https://storage.googleapis.com/${bucketName}/${fileName}`;
+        resolve(
+          new Response(
+            JSON.stringify({
+              message: "File uploaded successfully",
+              url: publicUrl,
+            }),
+            { status: 200 }
+          )
+        );
+      });
     });
+  } catch (error) {
+    console.error("Error in upload:", error);
+    return new Response(
+      JSON.stringify({
+        message: "Internal server error",
+        error: error.message,
+      }),
+      { status: 500 }
+    );
   }
 }
