@@ -3,6 +3,7 @@ import sharp from "sharp";
 
 // Increase the size limit for the API route
 export const config = {
+  runtime: "edge", // Use Vercel Edge Runtime
   api: {
     bodyParser: {
       sizeLimit: "100mb", // Increase the size limit to 100MB
