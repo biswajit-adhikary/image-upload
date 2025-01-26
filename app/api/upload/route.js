@@ -8,8 +8,9 @@ import sharp from "sharp";
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: "20mb",
+      sizeLimit: "5mb",
     },
+    responseLimit: false,
   },
 };
 
