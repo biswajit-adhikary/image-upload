@@ -22,7 +22,6 @@ export async function POST(req) {
   try {
     // Read form data
     const formData = await req.formData();
-    console.log(formData);
     const file = formData.get("file");
 
     if (!file) {

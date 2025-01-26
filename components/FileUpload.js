@@ -1,14 +1,15 @@
 "use client";
 import React, { useState } from "react";
 import imageCompression from "browser-image-compression";
+import Image from "next/image";
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
+  const [image, setImage] = useState(null);
   const [message, setMessage] = useState("");
 
   const handleFileChange = async (e) => {
     let imagefile = e.target.files[0];
-    console.log(imagefile);
     const options = {
       maxSizeMB: 1, // Maximum size in MB
       maxWidthOrHeight: 800, // Maximum width or height
@@ -16,15 +17,11 @@ const FileUpload = () => {
     };
     try {
       const compressedFile = await imageCompression(imagefile, options);
-      console.log(compressedFile);
+      setImage(URL.createObjectURL(compressedFile));
       setFile(compressedFile);
-      // setFile(URL.createObjectURL(compressedFile));
-      // console.log("Compressed file:", file);
     } catch (error) {
       console.error("Error compressing image:", error);
     }
-    // setFile(e.target.files[0]);
-    // console.log(e.target.files[0]);
   };
 
   const handleUpload = async (e) => {
@@ -66,6 +63,11 @@ const FileUpload = () => {
             className="block w-full border rounded p-2"
           />
         </div>
+        {image && (
+          <div className="mb-4">
+            <Image src={image} alt="Selected" width={500} height={200} />
+          </div>
+        )}
         <button
           type="submit"
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
