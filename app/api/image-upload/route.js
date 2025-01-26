@@ -1,9 +1,6 @@
 import { Storage } from "@google-cloud/storage";
 import sharp from "sharp";
 
-// Set runtime to 'edge' to use Vercel's Edge Functions
-export const runtime = "edge";
-
 // Initialize Google Cloud Storage client
 const storage = new Storage({
   projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
@@ -35,8 +32,8 @@ export async function POST(req) {
 
     // Compress the image using sharp
     const compressedBuffer = await sharp(await file.arrayBuffer())
-      .resize(600) // Resize the image to width 600px (optional)
-      .jpeg({ quality: 60 }) // Compress and convert to JPEG with 60% quality
+      .resize(500) // Resize the image to width 800px (optional)
+      .webp({ quality: 50 }) // Compress and convert to JPEG with 80% quality
       .toBuffer(); // Return as Buffer
 
     // Create a file in the Google Cloud Storage bucket
