@@ -1,13 +1,30 @@
 "use client";
 import React, { useState } from "react";
+import imageCompression from "browser-image-compression";
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files);
-    console.log(e.target.files);
+  const handleFileChange = async (e) => {
+    let imagefile = e.target.files[0];
+    console.log(imagefile);
+    const options = {
+      maxSizeMB: 1, // Maximum size in MB
+      maxWidthOrHeight: 800, // Maximum width or height
+      useWebWorker: true, // Use a web worker for compression
+    };
+    try {
+      const compressedFile = await imageCompression(imagefile, options);
+      console.log(compressedFile);
+      setFile(compressedFile);
+      // setFile(URL.createObjectURL(compressedFile));
+      // console.log("Compressed file:", file);
+    } catch (error) {
+      console.error("Error compressing image:", error);
+    }
+    // setFile(e.target.files[0]);
+    // console.log(e.target.files[0]);
   };
 
   const handleUpload = async (e) => {
@@ -19,7 +36,7 @@ const FileUpload = () => {
     }
 
     const formData = new FormData();
-    formData.append("files", file[0]);
+    formData.append("file", file);
 
     try {
       const response = await fetch("/api/image-upload", {

@@ -1,14 +1,8 @@
 import { Storage } from "@google-cloud/storage";
 import sharp from "sharp";
 
-// Increase the size limit for the API route
 export const config = {
   runtime: "edge", // Use Vercel Edge Runtime
-  api: {
-    bodyParser: {
-      sizeLimit: "100mb", // Increase the size limit to 100MB
-    },
-  },
 };
 
 // Initialize Google Cloud Storage client
@@ -28,7 +22,7 @@ export async function POST(req) {
   try {
     // Read form data
     const formData = await req.formData();
-    const file = formData.get("file");
+    const file = formData.get("files");
 
     if (!file) {
       return new Response(JSON.stringify({ message: "No file uploaded" }), {
@@ -41,21 +35,21 @@ export async function POST(req) {
 
     // Compress the image using sharp
     const compressedBuffer = await sharp(await file.arrayBuffer())
-      .resize(500) // Resize to a width of 500px (optional)
-      .webp({ quality: 50 }) // Compress and convert to WebP with 50% quality
+      .resize(500) // Resize the image to width 800px (optional)
+      .webp({ quality: 50 }) // Compress and convert to JPEG with 80% quality
       .toBuffer(); // Return as Buffer
 
     // Create a file in the Google Cloud Storage bucket
     const blob = bucket.file(fileName);
     const blobStream = blob.createWriteStream({
-      resumable: true, // Enable resumable upload for large files
-      contentType: file.type, // Ensure the content type is set correctly
+      resumable: false,
+      contentType: "image/jpeg", // Set content type for compressed JPEG image
     });
 
     // Pipe the compressed buffer to the stream
     blobStream.end(compressedBuffer);
 
-    // Return a Promise to manage the response asynchronously
+    // Return a Promise to manage asynchronous response
     return new Promise((resolve, reject) => {
       blobStream.on("error", (err) => {
         console.error("Error uploading file:", err);

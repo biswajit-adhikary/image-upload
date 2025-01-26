@@ -5,8 +5,8 @@ import NewUpload from "@/components/newUpload";
 export default function Home() {
   return (
     <>
-      {/* <FileUpload /> */}
-      <ImageUpload />
+      <FileUpload />
+      {/* <ImageUpload /> */}
       {/* <NewUpload /> */}
     </>
   );
