@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import React, { useState } from "react";
+import imageCompression from "browser-image-compression";
 
 const ImageUpload = () => {
   const [image, setImage] = useState(null); // To preview the image
@@ -9,10 +10,22 @@ const ImageUpload = () => {
   const [uploadMessage, setUploadMessage] = useState("");
 
   // Handle file selection
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file)); // Set preview
+      const options = {
+        maxSizeMB: 1, // Maximum size in MB
+        maxWidthOrHeight: 800, // Maximum width or height
+        useWebWorker: true, // Use a web worker for compression
+      };
+      try {
+        const compressedFile = await imageCompression(file, options);
+        setImage(URL.createObjectURL(compressedFile));
+        console.log("Compressed file:", compressedFile);
+      } catch (error) {
+        console.error("Error compressing image:", error);
+      }
+      // setImage(URL.createObjectURL(file)); // Set preview
     }
   };
 
