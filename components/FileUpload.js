@@ -20,24 +20,15 @@ const FileUpload = () => {
 
     const formData = new FormData();
     formData.append("files", file[0]);
-    formData.append("destination", "./public/uploads");
 
     try {
-      const response = await fetch("/api/upload", {
+      const response = await fetch("/api/image-upload", {
         method: "POST",
         body: formData,
       });
       const result = await response.text();
-      console.log(result);
-      if (response.ok) {
-        setMessage(
-          "File uploaded successfully! Image URL: /public/uploads/" +
-            file[0].name
-        );
-      } else {
-        const errorData = await response.json();
-        setMessage(errorData.error || "File upload failed.");
-      }
+      let resData = JSON.parse(result);
+      setMessage(`File uploaded successfully. URL: ${resData.url}`);
     } catch (error) {
       setMessage("An error occurred while uploading the file.");
       console.error("Upload error:", error);
