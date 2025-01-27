@@ -12,9 +12,9 @@ const FileUpload = () => {
   const handleFileChange = async (e) => {
     let imagefile = e.target.files[0];
     const options = {
-      maxSizeMB: 1, // Maximum size in MB
-      maxWidthOrHeight: 800, // Maximum width or height
-      useWebWorker: true, // Use a web worker for compression
+      maxSizeMB: 1,
+      maxWidthOrHeight: 800,
+      useWebWorker: true,
     };
     try {
       const compressedFile = await imageCompression(imagefile, options);
